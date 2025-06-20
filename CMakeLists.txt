@@ -178,7 +178,3 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-
-# In order to create the project, run:
-# cmake -B build .
-# then navigate to the 'build' directory and compile (e.g., `cmake --build .` or open .sln in Visual Studio)
