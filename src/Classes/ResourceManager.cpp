@@ -7,7 +7,7 @@
 std::map<std::string, Texture2D>    ResourceManager::Textures;
 std::map<std::string, Shader>       ResourceManager::Shaders;
 
-bool checkFileExists(const char*);
+void checkFileExists(std::string);
 
 Shader ResourceManager::LoadShader(const char* vShaderFile, const char* fShaderFile, const char* gShaderFile, std::string name)
 {
@@ -54,27 +54,25 @@ Shader ResourceManager::loadShaderFromFile(const char* vShaderFile, const char* 
 
     Shader shader;
 
+    std::string vShaderFilePath{ SHADER_SOURCE_DIR + std::string(vShaderFile) };
+    std::string fShaderFilePath{ SHADER_SOURCE_DIR + std::string(fShaderFile) };
+    std::string gShaderFilePath;
+    if (gShaderFile != nullptr)
+    {
+        gShaderFilePath = SHADER_SOURCE_DIR + std::string(gShaderFile);
+    }
 
     try
     {
-        if (!checkFileExists(vShaderFile))
+        checkFileExists(vShaderFilePath);
+        checkFileExists(fShaderFilePath);
+        if (gShaderFile != nullptr)
         {
-            Logger::error(
-                MESSAGE(fragmentCode.c_str())
-            );
-            throw std::exception("No file exists");
-        }
-
-        if (!checkFileExists(fShaderFile))
-        {
-            Logger::error(
-                MESSAGE(fragmentCode.c_str())
-            );
-            throw std::exception("No file exists");
+            checkFileExists(gShaderFilePath);
         }
 
         // open files
-        std::ifstream vertexShaderFile(vShaderFile,std::ios::in) , fragmentShaderFile(fShaderFile, std::ios::in);
+        std::ifstream vertexShaderFile(vShaderFilePath,std::ios::in) , fragmentShaderFile(fShaderFilePath, std::ios::in);
         std::stringstream vShaderStream, fShaderStream;
         // read file's buffer contents into streams
         vShaderStream << vertexShaderFile.rdbuf();
@@ -82,13 +80,15 @@ Shader ResourceManager::loadShaderFromFile(const char* vShaderFile, const char* 
         // close file handlers
         vertexShaderFile.close();
         fragmentShaderFile.close();
+
         // convert stream into string
         vertexCode = vShaderStream.str();
         fragmentCode = fShaderStream.str();
+
         // if geometry shader path is present, also load a geometry shader
         if (gShaderFile != nullptr)
         {
-            std::ifstream geometryShaderFile(gShaderFile);
+            std::ifstream geometryShaderFile(gShaderFilePath);
             std::stringstream gShaderStream;
             gShaderStream << geometryShaderFile.rdbuf();
             geometryShaderFile.close();
@@ -153,8 +153,17 @@ std::vector<std::string> ResourceManager::showResources()
     return resourceNames;
 };
 
-bool checkFileExists(const char* pathToFile)
+void checkFileExists(std::string pathToFile)
 {
     std::ifstream file(pathToFile);
-    return file.good();
+    if (!file.good())
+    {
+        throw std::exception(std::string("No file exists : " + pathToFile).c_str());
+    }
+    else
+    {
+        Logger::succes(
+            MESSAGE(std::string("file exists : ") + pathToFile)
+        );
+    }
 };

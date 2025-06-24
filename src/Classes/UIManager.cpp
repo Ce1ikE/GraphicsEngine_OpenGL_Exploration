@@ -53,7 +53,7 @@ void UIManager::RenderGameUI()
             // Set flag if any element was interacted with
             m_shaderUniformsChangedThisFrame = true; 
             Logger::info(
-                MESSAGE("Uniform value wa changed")
+                MESSAGE("Uniform value was changed")
             );
         }
     }
@@ -148,6 +148,10 @@ void UIManager::generateUIFromShader(Shader* shader) {
             uniformName == "model" || uniformName == "view" || uniformName == "projection" ||
             uniformName.find("[") != std::string::npos) // Skip array uniforms for simplicity for now
         {
+            Logger::info(
+                MESSAGE("Skipped uniform:  " + uniformName),
+                TURQUOISE
+            );
             continue;
         }
 
@@ -180,6 +184,10 @@ void UIManager::generateUIFromShader(Shader* shader) {
     }
 }
 
+void UIManager::generateUI()
+{
+    addUIElement(std::string("ViewMode"), std::make_unique<UISelect>(std::string("Enable Wireframe View"),std::vector<std::string>({"line","fill"})));
+};
 
 UIButton* UIManager::getButton(std::string& name) {
     auto it = UIElements.find(name);
@@ -201,6 +209,14 @@ UISliderVec3* UIManager::getSliderVec3(std::string& name)
     auto it = UIElements.find(name);
     if (it != UIElements.end()) {
         return dynamic_cast<UISliderVec3*>(it->second.get());
+    }
+    return nullptr;
+};
+UISelect* UIManager::getSelect(std::string& name)
+{
+    auto it = UIElements.find(name);
+    if (it != UIElements.end()) {
+        return dynamic_cast<UISelect*>(it->second.get());
     }
     return nullptr;
 };
@@ -255,4 +271,38 @@ glm::vec3 UISliderVec3::getValue()
 void UISliderVec3::setValue(glm::vec3& val) 
 { 
     m_value = val; 
+}
+
+UISelect::UISelect(std::string& label, std::vector<std::string>& selectables)
+{
+    m_label = label;
+    m_selectables = selectables;
+    m_selected = -1;
+    m_previous = -1;
+};
+bool UISelect::isChanged()
+{
+    bool changed = m_previous != m_selected;
+    m_previous = m_selected;
+    return changed;
+};
+int UISelect::getSelected()
+{
+    return m_selected;
+};
+bool UISelect::render()
+{
+    if (ImGui::TreeNode(m_label.c_str()))
+    {
+        for (int n = 0; n < m_selectables.size(); n++)
+        {
+            if (ImGui::Selectable(m_selectables[n].c_str(), m_selected == n))
+            {
+                m_selected = n;
+            }
+        }
+        ImGui::TreePop();
+    }
+
+    return false;
 }

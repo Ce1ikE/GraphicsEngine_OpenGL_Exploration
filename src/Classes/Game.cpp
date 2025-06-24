@@ -9,7 +9,16 @@ Game::Game(unsigned int width, unsigned int height, std::string name)
 	// shaders and textures
 	loadResources();
 
+	// enables wireframe view
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	// enables VSync
+	// https://www.khronos.org/opengl/wiki/Swap_Interval
+	glfwSwapInterval(1);
+	
+	// enables OpenGL to use the Z-buffer
 	glEnable(GL_DEPTH_TEST);
+	
 
 	Logger::succes(MESSAGE("Finished initialization...starting main rendering loop"));
 }
@@ -76,13 +85,58 @@ void Game::Update(float dt)
 			Logger::info(
 				MESSAGE("Recompiling shader...")
 			);
-			Shader recompiledShader = ResourceManager::LoadShader("shaders/vertexShaders.glsl", "shaders/fragmentShaders.glsl", nullptr, "basic");
+			Shader recompiledShader = ResourceManager::LoadShader("vertexShaders.glsl", "fragmentShaders.glsl", nullptr, "basic");
 			// After recompiling, might need to call generateUIFromShader again
 			// to update UI for new/changed uniforms.
 			UIManager::generateUIFromShader(&recompiledShader);
+			UIManager::generateUI();
 		}
 	}
+
+	if (UISelect* wireframeBtn = UIManager::getSelect(std::string("ViewMode"))) {
+		if (wireframeBtn->isChanged()) {
+			switch (wireframeBtn->getSelected())
+			{
+			case 0:
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				break;
+			case 1:
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				break;
+			default:
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				break;
+			}
+			Logger::info(
+				MESSAGE("Changed view mode...")
+			);
+		}
+	}
+
+	UpdateObjects(dt);
 }
+
+void Game::UpdateObjects(float dt)
+{
+
+	float rotationSpeedDegreesPerSecond = 30.0f;
+	float rotationAngle = rotationSpeedDegreesPerSecond * dt; // Angle for this frame
+	glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 1.0f);
+
+	for (auto& scenePair : UIManager::Scenes)
+	{
+		Scene& currentScene = scenePair.second;
+		if (currentScene.isActive)
+		{
+			for(auto& gameObjectPair : *currentScene.getGameObjects())
+			{
+				GameObject* gObj = gameObjectPair.second;
+				glm::quat frameRotation = glm::angleAxis(glm::radians(rotationAngle), rotationAxis);
+				gObj->setRotation(frameRotation * gObj->getRotation());
+			}
+		}
+	}
+};
 
 void Game::Render()
 {
@@ -92,10 +146,9 @@ void Game::Render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	UIManager::RenderActiveScenes();
+	
 	UIManager::StartFrame();
-
 	UIManager::RenderGameUI();
-
 	UIManager::EndFrame();
 }
 
@@ -176,17 +229,56 @@ void Game::loadResources()
 	// Next we want to create a vertex and fragment shader that actually processes this data
 	// shaders are written in the shader language "GLSL" (OpenGL Shading Language) which is a language very similar to C.
 	// the language has it's own datatypes and input output features
-	Shader newshader = ResourceManager::LoadShader("shaders/vertexShaders.glsl", "shaders/fragmentShaders.glsl", nullptr, "basic");
+	Shader newshader = ResourceManager::LoadShader("vertexShaders.glsl","fragmentShaders.glsl", nullptr, "basic");
 	UIManager::generateUIFromShader(&newshader);
+	UIManager::generateUI();
 }
 
 void Game::Run()
 {
 	// main loop a.k.a the "render loop"
 	// We don't want the application to draw a single image and then immediately quit and close the window
+	// https://community.khronos.org/t/confirmation-that-i-actually-understand-vaos-vbos-and-ebos/73711/6
+	
+	// BEFORE the drawing loop:
+	// ------------------------
+	// 1) create window instance and add the correct callbacks to the window
+	// 2) load and compile shaders
+	// 3) create a GameObject and attach materials and mesh 
+	//	3.1) material  = texture  + shader from the ResourceManager
+	//	3.2) mesh      = vertices + indices data from a file or hardcoded
+	//	  3.2.1) Generate VAO, VBO , EBO 
+	//	  3.2.2) bind VAO , 
+	//	  3.2.3) bind VBO , fill VBO
+	//    3.2.4) bind EBO , fill EBO
+	//	  3.2.5) Set up vertex attributes
+	//	  3.2.6) Unbind VBO
+
+	// DURING the drawing loop:
+	// ------------------------
+	// 1) Render calls the UIManger's RenderActiveScenes and then RenderUI
+	//  1.1) RenderActiveScenes calls renderScene on only the Scenes in which 'active' attribute is set to 'true'
+	//    1.1.1) renderScene = calls draw on every GameObject(such as Cube, Spheres) (glUseProgram + glDrawElements)
+	// 	  1.1.2) RenderUI    = calls all ImGui functions to draw and setup the UI + gathering input data
+	// 	         (e.g.: ImGui::NewFrame(), ImGui::Begin(), ImGui::End(), ImGui::Render())
+	// 2) based upon input data perform some actions such are recompiling shaders or adjusting Uniforms 
+	// 3) glfwPollEvents is called to check for events (the callbacks)
+	// 4) glfwSwapBuffers is called to swap front and back buffer
+
+
+	// AFTER the drawing loop:
+	// -----------------------
+	// 1) delete all vertex arrays
+	// 2) terminate glfw
+	// 3) shutdown ImGui
+
+	float lastFrameTime = 0.0f;
+	float deltaTime = 0.0f;
 	while (!glfwWindowShouldClose(m_gameWindow))
 	{
-		float deltaTime = glfwGetTime();
+		float currentFrameTime = glfwGetTime();
+		deltaTime = currentFrameTime - lastFrameTime;
+		lastFrameTime = currentFrameTime;
 
 		// RENDER ===================================================
 		Render();

@@ -4,11 +4,6 @@
 #include <sstream>
 #include <iomanip>
 
-/* STANDARD */
-#define WINDOW_STD_WIDTH			800
-#define WINDOW_STD_HEIGHT			600
-#define WINDOW_STD_NAME				"LearnOpenGL"
-
 /* LOGGING COLORS */
 #define RED							"\033[38;5;196m"
 #define GREEN						"\033[38;5;119m"
@@ -37,12 +32,3 @@
 #define LIGHT_GOLD					"\033[38;5;172m"
 #define LIGHT_TURQUOISE				"\033[38;5;37m"
 #define RESET_COLOR					"\033[0m"
-
-/* PATHS */
-#define ASSETS                      "assets/"
-#define IMAGE_ASSETS                ASSETS + "images/"
-#define MESH_ASSETS                 ASSETS + "meshes/"
-
-#define JPG_ASSET(name)             IMAGE_ASSETS + name 
-#define PNG_ASSET(name)             IMAGE_ASSETS + name 
-#define OBJ_ASSET(name)             MESH_ASSETS + name 

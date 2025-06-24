@@ -1,3 +1,7 @@
+# REF:
+# https://medium.com/@atkinssamuel/cmake-the-devil-you-know-9be0e963e5d6
+# https://dev.to/iblancasa/learning-cmake-2-43ga
+# https://cmake.org/
 
 cmake_minimum_required(VERSION 3.16)
 project(MyGameEngine VERSION 0.1.0)
@@ -6,7 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # append to the already existing variable "CMAKE_MODULE_PATH" 
-# the folder which contains cmake modules
+# the folder which contains cmake modules (it's empty but you never know later on)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 # ensure OpenGL is found "before" FetchContent for some cases, 
@@ -85,21 +89,26 @@ FetchContent_MakeAvailable(assimp_repo)
 
 # ---- Adds source files ----
 file(GLOB_RECURSE ENGINE_SRC_FILES 
-    "src/*.cpp" 
-    "src/Classes/*.cpp" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Classes/*.cpp" 
     # header files are found via include directories
 )
 
 # ---- Adds main executable and assets ----
 add_executable(MyGameEngine ${ENGINE_SRC_FILES})
 
-# copy shaders to the executable's output directory
-# this command runs after MyGameEngine is built.
-add_custom_command(TARGET MyGameEngine POST_BUILD
+# finds all files ending with .glsl in the shaders directory and its subdirectories
+file(GLOB_RECURSE SHADER_FILES 
+    "${CMAKE_CURRENT_SOURCE_DIR}/shaders/*.glsl"
+)
+# the shader files as a dependency for the executable
+# If any of these files change, CMake will consider 'MyGameEngine' out of date.
+add_custom_target(CopyShaders ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/shaders
         $<TARGET_FILE_DIR:MyGameEngine>/shaders
-    COMMENT "Copying shaders to build directory"
+    DEPENDS ${SHADER_FILES}
+    COMMENT "Copying shaders to build directory on shader change"
 )
 
 # copy shaders to the install prefix
@@ -110,39 +119,55 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shaders/
     COMPONENT Runtime 
 )
 
+target_compile_definitions(MyGameEngine PRIVATE 
+    
+    # STANDARD
+    WINDOW_STD_WIDTH=800;
+    WINDOW_STD_HEIGHT=600;
+    WINDOW_STD_NAME="LearnOpenGL";
+
+    # PATHS
+    ASSETS_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/";
+    IMAGE_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/images/";
+    MESH_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/meshes/";
+    JPG_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/images/jpg"; 
+    PNG_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/images/png";
+    OBJ_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/meshes/obj";
+    SHADER_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/shaders/";  
+)
+
 # ------------ Set up include directories ------------ #
 
 # these are the directories where the 
 # .cpp files will look for .h files
-
 target_include_directories(MyGameEngine PRIVATE
     # for all your custom headers
-    ${CMAKE_CURRENT_SOURCE_DIR}/includes 
-    ${CMAKE_CURRENT_SOURCE_DIR}/includes/Defaults
-    ${CMAKE_CURRENT_SOURCE_DIR}/includes/ResourceClasses
-    ${CMAKE_CURRENT_SOURCE_DIR}/includes/UtilClasses
+    "${CMAKE_CURRENT_SOURCE_DIR}/includes" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/includes/Defaults"
+    "${CMAKE_CURRENT_SOURCE_DIR}/includes/ResourceClasses"
+    "${CMAKE_CURRENT_SOURCE_DIR}/includes/UtilClasses"
 )
 
 # because ImGui doesn't have a CMakeList.txt file
 # we have to add it to our included directories 
 # STATIC links it directly into the executable
 add_library(ImGuiLibrary STATIC 
-    ${imgui_repo_SOURCE_DIR}/imgui.cpp
-    ${imgui_repo_SOURCE_DIR}/imgui_draw.cpp
-    ${imgui_repo_SOURCE_DIR}/imgui_tables.cpp
-    ${imgui_repo_SOURCE_DIR}/imgui_widgets.cpp
-    ${imgui_repo_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
-    ${imgui_repo_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    "${imgui_repo_SOURCE_DIR}/imgui.cpp"
+    "${imgui_repo_SOURCE_DIR}/imgui_draw.cpp"
+    "${imgui_repo_SOURCE_DIR}/imgui_tables.cpp"
+    "${imgui_repo_SOURCE_DIR}/imgui_widgets.cpp"
+    "${imgui_repo_SOURCE_DIR}/backends/imgui_impl_glfw.cpp"
+    "${imgui_repo_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp"
 )
 
 target_include_directories(ImGuiLibrary PUBLIC
-    ${imgui_repo_SOURCE_DIR}
-    ${imgui_repo_SOURCE_DIR}/backends
+    "${imgui_repo_SOURCE_DIR}"
+    "${imgui_repo_SOURCE_DIR}/backends"
 )
 
 target_include_directories(MyGameEngine PRIVATE
-    ${glm_repo_SOURCE_DIR} # for GLM headers
-    ${stb_repo_SOURCE_DIR} # for stb_image headers
+    "${glm_repo_SOURCE_DIR}" # for GLM headers
+    "${stb_repo_SOURCE_DIR}" # for stb_image headers
 )
 
 # ------------ Link dependencies to the executable ------------ #

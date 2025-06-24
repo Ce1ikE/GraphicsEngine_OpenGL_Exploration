@@ -9,6 +9,8 @@ in vec3 vertexPosition;
 // so that means we have a other way of passing variable to our program
 uniform float intensity;
 
+
+
 // this is the output of the program
 out vec4 FragColor;
 

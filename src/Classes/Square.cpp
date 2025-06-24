@@ -3,7 +3,7 @@
 Square::Square()
 {
 	std::vector<Vertex> vertices = {
-		// positions				// colors
+		// positions						 // colors
 		Vertex(glm::vec3( 0.5f,  0.5f, 0.0f),glm::vec3(0.0f, 0.0f, 1.0f)), // top right 
 		Vertex(glm::vec3( 0.5f, -0.5f, 0.0f),glm::vec3(0.0f, 0.0f, 1.0f)), // top right
 		Vertex(glm::vec3(-0.5f, -0.5f, 0.0f),glm::vec3(0.0f, 0.0f, 1.0f)), // bottom left 

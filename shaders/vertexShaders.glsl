@@ -11,6 +11,7 @@
  
 
 
+
 // the "in" keyword defines the input we can give to the program
 // the "layout" tells us in which location (previously set in the main function)
 // we can find the data
@@ -29,7 +30,7 @@ uniform mat4 projection;
 // GLSL just as in C and C++ has a main function in which the function is executed
 void main()
 {
-	gl_Position = vec4(aPos,1.0);
+	gl_Position = projection * view * model * vec4(aPos,1.0);
 
 	vertexPosition = aPos.xyz;
 };
