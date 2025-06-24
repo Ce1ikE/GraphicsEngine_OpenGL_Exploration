@@ -17,6 +17,7 @@
 #include "UtilClasses/Camera.h"
 #include "Defaults/availableResources.h"
 #include "ResourceClasses/Square.h"
+#include "ResourceClasses/Cube.h"
 #include "Defaults/config.h"
 #include "Logger.h"
 
@@ -24,19 +25,14 @@ using namespace std;
 
 int main(void) 
 {
-	// enables wireframe view
-	// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	
-	// enables VSync
-	// https://www.khronos.org/opengl/wiki/Swap_Interval
-	glfwSwapInterval(1);
-
 	Game game = Game(WINDOW_STD_WIDTH, WINDOW_STD_HEIGHT, WINDOW_STD_NAME);
 	
 	Camera camera = Camera();
+	
 	Scene scene = Scene();
-	scene.addGameObject(new Square());
 	scene.setCamera(&camera);
+	scene.addGameObject("cube", new Cube());
+
 	UIManager::addScene(&scene,"main scene");
 
 	game.Run();

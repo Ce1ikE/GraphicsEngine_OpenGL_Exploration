@@ -3,13 +3,17 @@
 #include "GameObject.h"
 #include "Camera.h"
 #include "Logger.h"
+#include <map>
 
 class Scene {
 public:
     Scene();
-    void addGameObject(GameObject* obj);
-    void setCamera(Camera* cam);
+    Scene(Camera*);
+    void addGameObject(std::string,GameObject* obj);
+    std::map<std::string, GameObject*>* getGameObjects();
 
+    void setCamera(Camera* cam);
+    Camera * getCamera();
     // The main rendering pass
     void renderScene(); 
 
@@ -23,6 +27,6 @@ public:
 
 
 private:
-    std::vector<GameObject*> m_gameObjects;
+    std::map<std::string, GameObject*> m_gameObjects;
     Camera* m_camera;
 };

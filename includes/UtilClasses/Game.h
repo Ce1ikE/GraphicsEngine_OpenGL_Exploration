@@ -57,6 +57,7 @@ private:
     void createWindow();
     // initialize the game resources (shader and textures)
     void loadResources();
-
+    // ...
+    void UpdateObjects(float dt);
 };
 

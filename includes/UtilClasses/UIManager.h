@@ -65,6 +65,20 @@ private:
     float m_max;
 };
 
+class UISelect : public BaseUIElement {
+public:
+    UISelect(std::string&, std::vector<std::string>&);
+    bool isChanged();
+    int getSelected();
+    bool render() override;
+
+private:
+    std::string m_label;
+    int m_selected;
+    int m_previous;
+    std::vector<std::string> m_selectables;
+};
+
 
 class UIManager {
 public:
@@ -86,15 +100,20 @@ public:
     static void addUIElement(std::string&, std::unique_ptr<BaseUIElement>);
     // Method to clear all dynamically generated UI elements
     static void clearDynamicUIElements();
+
     // Method to generate UI elements based on a Shader's uniforms
     static void generateUIFromShader(Shader*); // Forward declare Shader if needed
     static bool hasShaderUniformsChanged();
     static void resetShaderUniformsChangedFlag() { m_shaderUniformsChangedThisFrame = false; }
 
+    static void generateUI();
+
     // Getters to retrieve specific element types for their values (requires dynamic_cast)
     static UIButton* getButton(std::string&);
     static UISliderFloat* getSliderFloat(std::string&);
     static UISliderVec3* getSliderVec3(std::string&);
+    static UISelect* UIManager::getSelect(std::string&);
+
 
 	// activates the UI 
 	static void Init(GLFWwindow*);
