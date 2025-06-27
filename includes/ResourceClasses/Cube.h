@@ -1,11 +1,12 @@
 #pragma once
 
-#include "UtilClasses/GameObject.h"
-#include "ResourceClasses/ResourceManager.h"
+#include "GameObject.h"
+#include "ResourceManager.h"
 
 class Cube : public GameObject
 {
 public:
 	Cube();
+	Cube(glm::vec3&);
 private:
 };

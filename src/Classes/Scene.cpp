@@ -1,4 +1,4 @@
-#include "UtilClasses/Scene.h"
+#include "Scene.h"
 
 Scene::Scene() 
 {
@@ -15,7 +15,7 @@ void Scene::addGameObject(std::string gObjName,GameObject * gObj)
 {
     m_gameObjects[gObjName] = gObj;
     Logger::succes(
-        MESSAGE("Added new GameObject to scene")
+        MESSAGE("Added new GameObject to scene:" + gObjName)
     );
 };
 

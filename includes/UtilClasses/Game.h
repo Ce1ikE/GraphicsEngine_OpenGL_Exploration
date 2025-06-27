@@ -12,12 +12,13 @@ enum GameState {
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
-#include "Defaults/config.h"
-#include "Defaults/callbacks.h"
-#include "ResourceClasses/ResourceManager.h"
-#include "UtilClasses/UIManager.h"
-#include "UtilClasses/Logger.h"
-#include "UtilClasses/Scene.h"
+#include "config.h"
+#include "callbacks.h"
+#include "ResourceManager.h"
+#include "UIManager.h"
+#include "Logger.h"
+#include "Scene.h"
+#include "Cube.h"
 
 class Game
 {

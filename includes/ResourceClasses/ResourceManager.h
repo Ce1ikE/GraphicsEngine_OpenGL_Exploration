@@ -7,7 +7,7 @@
 
 #include "Texture2D.h"
 #include "Shader.h"
-#include "UtilClasses/Logger.h"
+#include "Logger.h"
 
 
 #include <iostream>

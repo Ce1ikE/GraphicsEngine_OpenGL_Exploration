@@ -1,4 +1,4 @@
-#include "ResourceClasses/Square.h"
+#include "Square.h"
 
 Square::Square()
 {
@@ -18,3 +18,9 @@ Square::Square()
 	GameObject::setMesh(new Mesh(vertices, indices));
 	GameObject::setMaterial(new Material(ResourceManager::GetShader("basic")));
 };
+
+Square::Square(glm::vec3& cubePosition)
+	:Square()
+{
+	setPosition(cubePosition);
+}

@@ -118,24 +118,6 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/shaders/
     # Group these files under a 'Runtime' component if you use components
     COMPONENT Runtime 
 )
-
-target_compile_definitions(MyGameEngine PRIVATE 
-    
-    # STANDARD
-    WINDOW_STD_WIDTH=800;
-    WINDOW_STD_HEIGHT=600;
-    WINDOW_STD_NAME="LearnOpenGL";
-
-    # PATHS
-    ASSETS_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/";
-    IMAGE_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/images/";
-    MESH_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/meshes/";
-    JPG_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/images/jpg"; 
-    PNG_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/images/png";
-    OBJ_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/meshes/obj";
-    SHADER_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/shaders/";  
-)
-
 # ------------ Set up include directories ------------ #
 
 # these are the directories where the 
@@ -202,4 +184,22 @@ hide_target_if_exists(update_assimp_zlib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+target_compile_definitions(MyGameEngine PRIVATE 
+    
+    # STANDARD
+    WINDOW_STD_WIDTH=800;
+    WINDOW_STD_HEIGHT=600;
+    WINDOW_STD_NAME="LearnOpenGL";
+    STD_SCENE="main scene"
+
+    # PATHS
+    ASSETS_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/";
+    IMAGE_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/images/";
+    MESH_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/meshes/";
+    JPG_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/images/jpg"; 
+    PNG_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/images/png";
+    OBJ_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/meshes/obj";
+    SHADER_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/shaders/";  
+)
 

@@ -83,7 +83,7 @@ private:
 class UIManager {
 public:
 	// Scene storage
-	static std::map<std::string, Scene>		Scenes;
+	static std::map<std::string, Scene*>		Scenes;
     // UI storage
     static std::map<std::string, std::unique_ptr<BaseUIElement>> UIElements;
     // a flag to indicate if any shader parameter uniform was changed via UI this frame
