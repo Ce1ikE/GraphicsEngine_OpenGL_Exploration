@@ -1,20 +1,7 @@
-#include "UtilClasses/Camera.h"
+#include "Camera.h"
 
 Camera::Camera() 
 {
-	// By convention, OpenGL is a right-handed system. 
-	// What this basically says is that :
-	// 1) the positive x-axis is to your right, 
-	// 2) the positive y-axis is up 
-	// 3) the positive z-axis is backwards. 
-	// Think of your screen being the center of the 3 axes and 
-	// the positive z-axis going through your screen towards you. 
-	m_view = glm::mat4(1.0f);
-	// note that we're translating the scene in the reverse direction of where we want to move the camera
-	// "To move a camera backwards, is the same as moving the entire scene forward"
-	m_view = glm::translate(m_view, glm::vec3(0.0f, 0.0f, -3.0f));
-	
-
 	// We can use orthographic or perspective projection for our scene
 	m_projection = glm::mat4(1.0f);
 	
@@ -43,6 +30,23 @@ Camera::Camera()
 	// and in our vertex shader we multiply these matrices => projection * view * model * vertexPosition
 	// https://learnopengl.com/img/getting-started/coordinate_systems.png
 	// http://www.songho.ca/opengl/gl_projectionmatrix.html
+
+	// https://learnopengl.com/Getting-started/Camera
+	// By convention, OpenGL is a right-handed system.
+	// What this basically says is that :
+	// 1) the positive x-axis is to your right, 
+	// 2) the positive y-axis is up 
+	// 3) the positive z-axis is backwards. 
+	// Think of your screen being the center of the 3 axes and 
+	// the positive z-axis going through your screen towards you. 
+	m_view = glm::mat4(1.0f);
+	// note that we're translating the scene in the reverse direction of where we want to move the camera
+	// "To move a camera backwards, is the same as moving the entire scene forward"
+
+	m_cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+	m_cameraPosition = glm::vec3(0.0f, 0.0f, 3.0f);
+
+	UpdateDirection();
 };
 
 glm::mat4& Camera::getView()
@@ -63,4 +67,89 @@ void Camera::setView(glm::mat4& newView)
 void Camera::setProjection(glm::mat4& newProjection)
 {
 	m_projection = newProjection;
+};
+
+void Camera::setCameraPosition(glm::vec3& newPosition)
+{
+	m_cameraPosition = newPosition;
+	UpdateDirection();
+};
+
+glm::vec3 Camera::getCameraPosition()
+{
+	return m_cameraPosition;
+};
+
+void Camera::setCameraTarget(glm::vec3& newTarget)
+{
+	m_cameraTarget = newTarget;
+	UpdateDirection();
+};
+
+glm::vec3 Camera::getCameraTarget()
+{
+	return m_cameraTarget;
+};
+
+void Camera::UpdateView()
+{
+	glm::vec3 upWorldSpace = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	m_view = glm::lookAt(
+		m_cameraPosition,
+		m_cameraDirection,
+		upWorldSpace
+	);
+};
+
+void Camera::UpdateDirection()
+{
+	m_cameraDirection = glm::normalize(m_cameraPosition - m_cameraTarget);
+	UpdateView();
+};
+
+void Camera::UpdateCamera(float dt,bool* keys)
+{
+	glm::vec3 upWorldSpace = glm::vec3(0.0f, 1.0f, 0.0f);
+	bool cameraMoved = false;
+	if (keys[GLFW_KEY_W] == true)
+	{
+		cameraMoved = true;
+		Logger::info(
+			MESSAGE("W key pressed")
+		);
+		m_cameraPosition += m_cameraSpeed * m_cameraDirection * dt;
+	}
+	if (keys[GLFW_KEY_S] == true)
+	{
+		cameraMoved = true;
+		Logger::info(
+			MESSAGE("S key pressed")
+		);		
+		m_cameraPosition -= m_cameraSpeed * m_cameraDirection * dt;
+	}
+	if (keys[GLFW_KEY_A] == true)
+	{
+		cameraMoved = true;
+		Logger::info(
+			MESSAGE("A key pressed")
+		);
+		m_cameraPosition -= glm::normalize(glm::cross(m_cameraDirection, upWorldSpace)) * m_cameraSpeed * dt;
+	}
+	if (keys[GLFW_KEY_D] == true)
+	{
+		cameraMoved = true;
+		Logger::info(
+			MESSAGE("D key pressed")
+		);
+		m_cameraPosition += glm::normalize(glm::cross(m_cameraDirection, upWorldSpace)) * m_cameraSpeed * dt;
+	}
+
+	if(cameraMoved)
+	{
+		UpdateDirection();
+		Logger::info(
+			MESSAGE(std::string("X: " + std::to_string(m_cameraPosition.x) + "Z: " + std::to_string(m_cameraPosition.z)))
+		);
+	}
 };

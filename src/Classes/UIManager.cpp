@@ -1,7 +1,7 @@
 #include "UtilClasses/UIManager.h"
 
 
-std::map<std::string, Scene>		UIManager::Scenes;
+std::map<std::string, Scene*>		UIManager::Scenes;
 std::map<std::string, std::unique_ptr<BaseUIElement>> UIManager::UIElements;
 bool UIManager::m_shaderUniformsChangedThisFrame = false;
 
@@ -10,9 +10,9 @@ void UIManager::RenderActiveScenes()
 {
 	for (auto scene : Scenes)
 	{
-		if (scene.second.isActive)
+		if (scene.second->isActive)
 		{
-			scene.second.renderScene();
+			scene.second->renderScene();
 		}
 		else
 		{
@@ -81,7 +81,7 @@ void UIManager::Init(GLFWwindow* window)
 
 void UIManager::addScene(Scene* newScene, std::string name)
 {
-	Scenes[name] = *newScene;
+	Scenes[name] = newScene;
 };
 
 UIManager::~UIManager()
@@ -186,7 +186,7 @@ void UIManager::generateUIFromShader(Shader* shader) {
 
 void UIManager::generateUI()
 {
-    addUIElement(std::string("ViewMode"), std::make_unique<UISelect>(std::string("Enable Wireframe View"),std::vector<std::string>({"line","fill"})));
+    addUIElement(std::string("ViewMode"), std::make_unique<UISelect>(std::string("View mode"),std::vector<std::string>({"line","fill"})));
 };
 
 UIButton* UIManager::getButton(std::string& name) {

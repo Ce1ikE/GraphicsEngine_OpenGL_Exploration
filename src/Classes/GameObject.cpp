@@ -6,7 +6,7 @@ GameObject::GameObject()
 	m_mesh = nullptr;
 
 	m_position = glm::vec3(0.0f);
-	m_rotation = glm::vec3(1.0f);
+	m_rotation = glm::vec3(0.0f);
 	m_scale = glm::vec3(1.0f);
 
 	updateModelMatrix();
@@ -18,7 +18,7 @@ GameObject::GameObject(Mesh* mesh, Material* material)
 	m_material = material;
 
 	m_position = glm::vec3(0.0f);
-	m_rotation = glm::vec3(1.0f);
+	m_rotation = glm::vec3(0.0f);
 	m_scale = glm::vec3(1.0f);
 	m_model = glm::mat4(1.0f);
 };

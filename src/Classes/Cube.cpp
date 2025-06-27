@@ -1,4 +1,4 @@
-#include "ResourceClasses/Cube.h"
+#include "Cube.h"
 
 
 Cube::Cube()
@@ -13,7 +13,7 @@ Cube::Cube()
 	std::vector<Vertex> vertices = {
 		// positions                           // colors
 		Vertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(1.0f, 0.0f, 0.0f)), // 0
-		Vertex(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 1.0f, 0.0f)),   // 1
+		Vertex(glm::vec3( 0.5f, -0.5f, -0.5f), glm::vec3(0.0f, 1.0f, 0.0f)), // 1
 		Vertex(glm::vec3( 0.5f,  0.5f, -0.5f), glm::vec3(0.0f, 0.0f, 1.0f)), // 2
 		Vertex(glm::vec3(-0.5f,  0.5f, -0.5f), glm::vec3(1.0f, 1.0f, 0.0f)), // 3
 		Vertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec3(1.0f, 0.0f, 1.0f)), // 4
@@ -63,3 +63,9 @@ Cube::Cube()
 	GameObject::setMesh(new Mesh(vertices, indices));
 	GameObject::setMaterial(new Material(ResourceManager::GetShader("basic")));
 };
+
+Cube::Cube(glm::vec3& cubePosition)
+	:Cube()
+{
+	setPosition(cubePosition);
+}

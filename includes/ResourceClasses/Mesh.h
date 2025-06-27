@@ -10,6 +10,7 @@
 #include "Logger.h"
 
 struct Vertex {
+    Vertex(){};
     Vertex(glm::vec3 pos, glm::vec3 clr)
     {
         m_position = pos;

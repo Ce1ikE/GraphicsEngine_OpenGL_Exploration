@@ -98,10 +98,10 @@ void Game::Update(float dt)
 			switch (wireframeBtn->getSelected())
 			{
 			case 0:
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				break;
 			case 1:
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 				break;
 			default:
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -123,19 +123,12 @@ void Game::UpdateObjects(float dt)
 	float rotationAngle = rotationSpeedDegreesPerSecond * dt; // Angle for this frame
 	glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 1.0f);
 
-	for (auto& scenePair : UIManager::Scenes)
+	Scene* mainScene = UIManager::Scenes[STD_SCENE];
+	if (mainScene)
 	{
-		Scene& currentScene = scenePair.second;
-		if (currentScene.isActive)
-		{
-			for(auto& gameObjectPair : *currentScene.getGameObjects())
-			{
-				GameObject* gObj = gameObjectPair.second;
-				glm::quat frameRotation = glm::angleAxis(glm::radians(rotationAngle), rotationAxis);
-				gObj->setRotation(frameRotation * gObj->getRotation());
-			}
-		}
+		mainScene->getCamera()->UpdateCamera(dt, m_keys);
 	}
+
 };
 
 void Game::Render()
@@ -182,7 +175,6 @@ void Game::handleKeyInput(GLFWwindow* window, int key, int scancode, int action,
 			m_keys[key] = false;
 		}
 	}
-
 };
 
 void Game::UISetup()
