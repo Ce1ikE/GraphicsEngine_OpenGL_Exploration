@@ -51,6 +51,7 @@ void GameObject::setMaterial(Material* material)
 	m_material = material;
 };
 
+glm::mat4 GameObject::getModel() { return m_model; };
 glm::vec3 GameObject::getPosition() { return m_position; };
 glm::quat GameObject::getRotation() { return m_rotation; };
 glm::vec3 GameObject::getScale() { return m_scale; };
@@ -68,7 +69,7 @@ void GameObject::updateModelMatrix()
 	// glm operations apply transformations from right to left if you multiply
 	// the matrix by the new transformation: m_model = transform * m_model
 	// but if you do m_model = m_model * transform, it applies in world space
-	 // The way done above is more intuitive and standard: build T, then multiply by R, then by S.
+	// The way done above is more intuitive and standard: build T, then multiply by R, then by S.
 	// Or, more explicitly:
 	/*
 		glm::mat4 transMatrix = glm::translate(glm::mat4(1.0f), m_position);
@@ -78,7 +79,7 @@ void GameObject::updateModelMatrix()
 	*/
 };
 
-void GameObject::draw(const glm::mat4& view, const glm::mat4& projection) const
+void GameObject::draw(const glm::mat4& view, const glm::mat4& projection)
 {
 	Shader& currentShader = m_material->use();
 	currentShader.SetMatrix4("model", m_model);

@@ -7,7 +7,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-#include "UtilClasses/Logger.h"
+#include "Logger.h"
 
 
 // General purpose shader object. Compiles from file, generates

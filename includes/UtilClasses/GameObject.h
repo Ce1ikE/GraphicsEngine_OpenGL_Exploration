@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ResourceClasses/Mesh.h"
-#include "ResourceClasses/Material.h"
+#include "Mesh.h"
+#include "Material.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 class GameObject {
@@ -14,6 +14,7 @@ public:
     void setScale(const glm::vec3&);
     void setMesh(Mesh*);
     void setMaterial(Material*);
+    glm::mat4 getModel();
     glm::vec3 getPosition();
     glm::quat getRotation();
     glm::vec3 getScale();
@@ -26,7 +27,7 @@ public:
 
 
     // Draws the object
-    void draw(const glm::mat4&, const glm::mat4&) const;
+    virtual void draw(const glm::mat4&, const glm::mat4&);
 
 
     // Optionally, children for hierarchical transforms (e.g., robot arm)

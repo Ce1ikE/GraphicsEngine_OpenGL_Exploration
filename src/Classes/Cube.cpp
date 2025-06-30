@@ -61,7 +61,7 @@ Cube::Cube()
 	};
 
 	GameObject::setMesh(new Mesh(vertices, indices));
-	GameObject::setMaterial(new Material(ResourceManager::GetShader("basic")));
+	GameObject::setMaterial(new Material(ResourceManager::GetShader(STD_SHADER)));
 };
 
 Cube::Cube(glm::vec3& cubePosition)

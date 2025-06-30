@@ -4,12 +4,19 @@ Mesh::Mesh() {};
 
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) 
 {
+	m_indexCount = 0;
+	m_vertexCount = 0;
 	try
 	{
 		if (indices.size())
 		{
 			m_isIndexed = true;
 			m_indexCount = indices.size();
+		}
+		else
+		{
+			m_isIndexed = false;
+			m_vertexCount = vertices.size();
 		}
 		setupMesh(vertices,indices);
 
@@ -49,17 +56,27 @@ void Mesh::unbind() const
 	glBindVertexArray(0);
 };
 
-void Mesh::draw() const
+void Mesh::draw(bool drawTriangles) const
 {
 	bind();
 
 	if (m_isIndexed)
 	{
-		glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
+		if (drawTriangles) {
+			glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, 0);
+		}
+		else {
+			glDrawElements(GL_LINES, m_indexCount, GL_UNSIGNED_INT, 0);
+		}
 	}
 	else
 	{
-		glDrawArrays(GL_TRIANGLES, 0, m_indexCount);
+		if (drawTriangles) {
+			glDrawArrays(GL_TRIANGLES, 0, m_vertexCount);
+		}
+		else {
+			glDrawArrays(GL_LINES, 0, m_vertexCount);
+		}
 	}
 
 	unbind();
