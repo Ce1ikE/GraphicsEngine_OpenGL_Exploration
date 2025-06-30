@@ -91,6 +91,7 @@ FetchContent_MakeAvailable(assimp_repo)
 file(GLOB_RECURSE ENGINE_SRC_FILES 
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" 
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Classes/*.cpp" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Classes/UI/*.cpp" 
     # header files are found via include directories
 )
 
@@ -128,6 +129,7 @@ target_include_directories(MyGameEngine PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/includes/Defaults"
     "${CMAKE_CURRENT_SOURCE_DIR}/includes/ResourceClasses"
     "${CMAKE_CURRENT_SOURCE_DIR}/includes/UtilClasses"
+    "${CMAKE_CURRENT_SOURCE_DIR}/includes/UIClasses"
 )
 
 # because ImGui doesn't have a CMakeList.txt file
@@ -191,7 +193,8 @@ target_compile_definitions(MyGameEngine PRIVATE
     WINDOW_STD_WIDTH=800;
     WINDOW_STD_HEIGHT=600;
     WINDOW_STD_NAME="LearnOpenGL";
-    STD_SCENE="main scene"
+    STD_SCENE="main_scene"
+    STD_SHADER="basic"
 
     # PATHS
     ASSETS_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets/";

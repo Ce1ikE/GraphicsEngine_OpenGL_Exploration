@@ -16,7 +16,7 @@ Square::Square()
 	};
 
 	GameObject::setMesh(new Mesh(vertices, indices));
-	GameObject::setMaterial(new Material(ResourceManager::GetShader("basic")));
+	GameObject::setMaterial(new Material(ResourceManager::GetShader(STD_SHADER)));
 };
 
 Square::Square(glm::vec3& cubePosition)

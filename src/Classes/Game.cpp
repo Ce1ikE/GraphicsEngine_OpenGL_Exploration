@@ -4,22 +4,15 @@ Game::Game(unsigned int width, unsigned int height, std::string name)
     : m_state(GAME_ACTIVE), m_keys(), m_windowWidth(width), m_windowHeight(height)
 {
 	Init();
-	registerCallbacks();
-	UISetup();
-	// shaders and textures
-	loadResources();
-
-	// enables wireframe view
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	// enables VSync
-	// https://www.khronos.org/opengl/wiki/Swap_Interval
-	glfwSwapInterval(1);
 	
-	// enables OpenGL to use the Z-buffer
-	glEnable(GL_DEPTH_TEST);
-	
+	for (int i = 0;i < 8;i++)
+	{
+		m_mouseKeys[i] = GLFW_RELEASE;
+	}
 
+	int nrAttributes;
+	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+	Logger::info(MESSAGE("Application started\nMaximum nr of vertex attributes supported : " + std::to_string(nrAttributes)));
 	Logger::succes(MESSAGE("Finished initialization...starting main rendering loop"));
 }
 
@@ -33,9 +26,7 @@ Game::~Game()
 void Game::Init()
 {
 	glfwInit();
-
 	createWindow();
-
 	// GLAD manages function pointers for OpenGL 
 	// so we want to initialize GLAD before we call any OpenGL function
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -46,140 +37,19 @@ void Game::Init()
 		glfwTerminate();
 		return;
 	}
-
-	int nrAttributes;
-	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-	Logger::info(MESSAGE("Application started\nMaximum nr of vertex attributes supported : " + std::to_string(nrAttributes)));
-
-}
-
-void Game::Update(float dt)
-{
-	// a callback handles keypresses but based upon what is currently pressed 
-	// we want to do some calculations such as moving camera, rotating ,clicking , etc...
-
-	if (UIManager::hasShaderUniformsChanged()) {
-		Shader* currentShader = ResourceManager::GetShader("basic"); // Get the active shader
-
-		if (currentShader) {
-			// Iterate through the UI elements and update the corresponding shader uniforms
-			for (auto const& [name, element_ptr] : UIManager::UIElements) {
-
-				if (auto sliderFloat = dynamic_cast<UISliderFloat*>(element_ptr.get())) {
-					currentShader->SetFloat(name.c_str(), sliderFloat->getValue());
-				}
-				else if (auto sliderVec3 = dynamic_cast<UISliderVec3*>(element_ptr.get())) {
-					currentShader->SetVector3f(name.c_str(), sliderVec3->getValue());
-				}
-				// ... handle other types ...
-			}
-		}
-		// Reset the flag after processing
-		UIManager::resetShaderUniformsChangedFlag(); 
-	}
-
-	// Option 2: Check specific buttons
-	if (UIButton* recompileBtn = UIManager::getButton(std::string("RecompileShaderButton"))) {
-		if (recompileBtn->isClicked()) {
-			// Trigger shader recompile logic
-			Logger::info(
-				MESSAGE("Recompiling shader...")
-			);
-			Shader recompiledShader = ResourceManager::LoadShader("vertexShaders.glsl", "fragmentShaders.glsl", nullptr, "basic");
-			// After recompiling, might need to call generateUIFromShader again
-			// to update UI for new/changed uniforms.
-			UIManager::generateUIFromShader(&recompiledShader);
-			UIManager::generateUI();
-		}
-	}
-
-	if (UISelect* wireframeBtn = UIManager::getSelect(std::string("ViewMode"))) {
-		if (wireframeBtn->isChanged()) {
-			switch (wireframeBtn->getSelected())
-			{
-			case 0:
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-				break;
-			case 1:
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				break;
-			default:
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-				break;
-			}
-			Logger::info(
-				MESSAGE("Changed view mode...")
-			);
-		}
-	}
-
-	UpdateObjects(dt);
-}
-
-void Game::UpdateObjects(float dt)
-{
-
-	float rotationSpeedDegreesPerSecond = 30.0f;
-	float rotationAngle = rotationSpeedDegreesPerSecond * dt; // Angle for this frame
-	glm::vec3 rotationAxis = glm::vec3(0.0f, 1.0f, 1.0f);
-
-	Scene* mainScene = UIManager::Scenes[STD_SCENE];
-	if (mainScene)
-	{
-		mainScene->getCamera()->UpdateCamera(dt, m_keys);
-	}
-
-};
-
-void Game::Render()
-{
-	// is a state-setting function
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	// is a state-using function
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	UIManager::RenderActiveScenes();
-	
-	UIManager::StartFrame();
-	UIManager::RenderGameUI();
-	UIManager::EndFrame();
-}
-
-void Game::handleFramebufferSize(GLFWwindow* window, int width, int height)
-{
-	// We have to tell OpenGL the size of the rendering window 
-	// so OpenGL knows how we want to display the data and coordinates 
-	// with respect to the window.
-	glViewport(0, 0, width, height);
-};
-
-void Game::handleKeyInput(GLFWwindow* window, int key, int scancode, int action, int mode)
-{
-	// when a user presses the escape key, we set the WindowShouldClose property to true, closing the application
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-	{
-		glfwSetWindowShouldClose(window, true);
-		Logger::info(
-			MESSAGE("ESC pressed")
-		);
-	}
-
-	if (key >= 0 && key < 1024)
-	{
-		if (action == GLFW_PRESS)
-		{
-			m_keys[key] = true;
-		}
-		else if (action == GLFW_RELEASE)
-		{
-			m_keys[key] = false;
-		}
-	}
-};
-
-void Game::UISetup()
-{
+	// sets the callbacks for all devices (keyboard , display , window , mouse, etc...)
+	registerCallbacks();
+	// sets up ImGui
 	UIManager::Init(m_gameWindow);
+	// shaders and textures
+	loadResources();
+	// enables VSync
+	// https://www.khronos.org/opengl/wiki/Swap_Interval
+	glfwSwapInterval(1);
+	// enables OpenGL to use the Z-buffer
+	glEnable(GL_DEPTH_TEST);
+	// set the input mode of the cursor
+	glfwSetInputMode(m_gameWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 void Game::registerCallbacks()
@@ -187,11 +57,20 @@ void Game::registerCallbacks()
 	// the moment a user resizes the window the viewport should be adjusted as well. 
 	// We can register a callback function on the window that gets called each time the window is resized
 	glfwSetFramebufferSizeCallback(m_gameWindow, framebuffer_size_callback);
-	glfwSetKeyCallback(m_gameWindow, key_callback);
 	// There are many callbacks functions we can set to register our own functions. 
 	// For example, we can make a callback function to process joystick input changes, process error messages etc. 
-	// We register the callback functions after we've created the window and before the render loop is initiated.
-
+	// We register the callback functions after we've created the window and before the render loop is initiated
+	// https://www.glfw.org/docs/3.3/input_guide.html
+	// reports when keyboard button is pressed/released
+	glfwSetKeyCallback(m_gameWindow, keyboard_callback);
+	// cursor position, measured in screen coordinates
+	glfwSetCursorPosCallback(m_gameWindow, cursor_position_callback);
+	// reports when mouse button is pressed/released
+	glfwSetMouseButtonCallback(m_gameWindow, mouse_button_callback);
+	// reports when mouse scroll is moved
+	glfwSetScrollCallback(m_gameWindow, mouse_scroll_callback);
+	// thies a pointer to the window object (here we pass "this" such that we can retrieve the Game object)
+	// this allows us to retrieve the Game object in the callback functions
 	glfwSetWindowUserPointer(m_gameWindow, this);
 };
 
@@ -201,7 +80,6 @@ void Game::createWindow()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
 	// This window object holds all the windowing data and is required by most of GLFW's other functions.
 	m_gameWindow = glfwCreateWindow(WINDOW_STD_WIDTH, WINDOW_STD_HEIGHT, WINDOW_STD_NAME, NULL, NULL);
 	if (m_gameWindow == NULL)
@@ -212,7 +90,6 @@ void Game::createWindow()
 		glfwTerminate();
 		return;
 	}
-
 	glfwMakeContextCurrent(m_gameWindow);
 }
 
@@ -221,9 +98,28 @@ void Game::loadResources()
 	// Next we want to create a vertex and fragment shader that actually processes this data
 	// shaders are written in the shader language "GLSL" (OpenGL Shading Language) which is a language very similar to C.
 	// the language has it's own datatypes and input output features
-	Shader newshader = ResourceManager::LoadShader("vertexShaders.glsl","fragmentShaders.glsl", nullptr, "basic");
-	UIManager::generateUIFromShader(&newshader);
+	Shader newshader = ResourceManager::LoadShader("vertexShaders.glsl", "fragmentShaders.glsl", nullptr, STD_SHADER);
+	UIManager::generateUIShader(&newshader);
 	UIManager::generateUI();
+}
+
+void Game::Update(float dt)
+{
+	// a callback handles keypresses but based upon what is currently pressed 
+	// we want to do some calculations such as moving camera, rotating ,clicking , etc...
+	UIManager::update(dt);
+}
+
+void Game::Render()
+{
+	// is a state-setting function
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	// is a state-using function
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	UIManager::RenderActiveScenes();
+	UIManager::StartFrame();
+	UIManager::RenderGameUI();
+	UIManager::EndFrame();
 }
 
 void Game::Run()

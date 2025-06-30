@@ -38,7 +38,7 @@ public:
     void freeResources();
 
     // Calls glDrawElements or glDrawArrays
-    void draw() const; 
+    void draw(bool drawTriangles = true) const; 
 
     // For dynamic data (e.g., particles, or deforming meshes)
     void updateVertices(const std::vector<Vertex>& newVertices);
@@ -47,6 +47,7 @@ private:
     unsigned int m_VAO_ID, m_VBO_ID, m_EBO_ID; // OpenGL IDs
     size_t m_indexCount;
     bool m_isIndexed;
+    size_t m_vertexCount;
 
     void setupMesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
 };

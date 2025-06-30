@@ -10,8 +10,6 @@
 // however if something is far away from your camera and only equals to 30 pixels through your camera it becomes more expensive doing it in the vertex shader then in the fragement shader
  
 
-
-
 // the "in" keyword defines the input we can give to the program
 // the "layout" tells us in which location (previously set in the main function)
 // we can find the data
