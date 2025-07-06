@@ -65,10 +65,17 @@ Shader ResourceManager::loadShaderFromFile(const char* vShaderFile, const char* 
     try
     {
         checkFileExists(vShaderFilePath);
+        shader.setVertexSource(vShaderFile);
         checkFileExists(fShaderFilePath);
+        shader.setFragmentSource(fShaderFile);
         if (gShaderFile != nullptr)
         {
             checkFileExists(gShaderFilePath);
+            shader.setGeometrySource(gShaderFile);
+        }
+        else
+        {
+            shader.setGeometrySource(nullptr);
         }
 
         // open files

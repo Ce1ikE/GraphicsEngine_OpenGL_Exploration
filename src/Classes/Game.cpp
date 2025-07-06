@@ -40,9 +40,7 @@ void Game::Init()
 	// sets the callbacks for all devices (keyboard , display , window , mouse, etc...)
 	registerCallbacks();
 	// sets up ImGui
-	UIManager::Init(m_gameWindow);
-	// shaders and textures
-	loadResources();
+	UIManager::getInstance().Init(m_gameWindow);
 	// enables VSync
 	// https://www.khronos.org/opengl/wiki/Swap_Interval
 	glfwSwapInterval(1);
@@ -95,19 +93,16 @@ void Game::createWindow()
 
 void Game::loadResources()
 {
-	// Next we want to create a vertex and fragment shader that actually processes this data
+	// Next we want to create a vertex and fragment shader that actually processes data
 	// shaders are written in the shader language "GLSL" (OpenGL Shading Language) which is a language very similar to C.
 	// the language has it's own datatypes and input output features
-	Shader newshader = ResourceManager::LoadShader("vertexShaders.glsl", "fragmentShaders.glsl", nullptr, STD_SHADER);
-	UIManager::generateUIShader(&newshader);
-	UIManager::generateUI();
+	ResourceManager::LoadShader("vertexShaders.glsl", "fragmentShaders.glsl", nullptr, STD_SHADER);
+	UIManager::getInstance().generateEngineUI();
 }
 
 void Game::Update(float dt)
 {
-	// a callback handles keypresses but based upon what is currently pressed 
-	// we want to do some calculations such as moving camera, rotating ,clicking , etc...
-	UIManager::update(dt);
+	UIManager::getInstance().update(dt);
 }
 
 void Game::Render()
@@ -116,10 +111,8 @@ void Game::Render()
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	// is a state-using function
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	UIManager::RenderActiveScenes();
-	UIManager::StartFrame();
-	UIManager::RenderGameUI();
-	UIManager::EndFrame();
+	UIManager::getInstance().RenderActiveScenes();
+	UIManager::getInstance().RenderEngineUI();
 }
 
 void Game::Run()
@@ -160,6 +153,9 @@ void Game::Run()
 	// 2) terminate glfw
 	// 3) shutdown ImGui
 
+	// shaders and textures
+	loadResources();
+	
 	float lastFrameTime = 0.0f;
 	float deltaTime = 0.0f;
 	while (!glfwWindowShouldClose(m_gameWindow))
