@@ -101,6 +101,7 @@ add_executable(MyGameEngine ${ENGINE_SRC_FILES})
 # finds all files ending with .glsl in the shaders directory and its subdirectories
 file(GLOB_RECURSE SHADER_FILES 
     "${CMAKE_CURRENT_SOURCE_DIR}/shaders/*.glsl"
+    "${CMAKE_CURRENT_SOURCE_DIR}/shaders/default/*.glsl"
 )
 # the shader files as a dependency for the executable
 # If any of these files change, CMake will consider 'MyGameEngine' out of date.

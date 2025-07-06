@@ -19,6 +19,8 @@ enum GameState {
 #include "Logger.h"
 #include "Scene.h"
 #include "Cube.h"
+#include "UIEvent.h"
+#include "UIEventQueue.h"
 
 class Game
 {

@@ -18,8 +18,11 @@ class Shader
 public:
     // state
     unsigned int ID;
+    std::string m_vShaderFile;
+    std::string m_fShaderFile;
+    std::string m_gShaderFile;
     // constructor
-    Shader() {}
+    Shader();
     // sets the current shader as active
     Shader& Use();
     // compiles the shader from given source code
@@ -34,6 +37,14 @@ public:
     void    SetVector4f(const char* name, float x, float y, float z, float w, bool useShader = false);
     void    SetVector4f(const char* name, const glm::vec4& value, bool useShader = false);
     void    SetMatrix4(const char* name, const glm::mat4& matrix, bool useShader = false);
+
+    const char* getFragmentSource();
+    const char* getVertexSource();
+    const char* getGeometrySource();
+    void setFragmentSource(const char*);
+    void setVertexSource(const char*);
+    void setGeometrySource(const char*);
+    void setSources(const char*, const char*, const char*);
 private:
     // checks if compilation or linking failed and if so, print the error logs
     void    checkCompileErrors(unsigned int object, std::string type);

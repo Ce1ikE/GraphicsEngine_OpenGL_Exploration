@@ -123,7 +123,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	Game* gameInstance = static_cast<Game*>(glfwGetWindowUserPointer(window));
 	if (gameInstance) {
-		if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
+		if (button == GLFW_MOUSE_BUTTON_MIDDLE || button == GLFW_MOUSE_BUTTON_RIGHT) {
 			if (action == GLFW_PRESS) {
 				gameInstance->m_mouseKeys[GLFW_MOUSE_BUTTON_MIDDLE] = true;
 				// Capture initial position when button is pressed

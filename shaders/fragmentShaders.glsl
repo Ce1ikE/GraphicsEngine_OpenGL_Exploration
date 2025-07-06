@@ -15,6 +15,6 @@ out vec4 FragColor;
 // just as in the vertex shader we have a main function
 void main()
 {
-	FragColor = vec4(vertexPosition.xyz * intensity, 1.0);
+	FragColor = vec4(vertexPosition.xyz, 1.0);
 };
 	

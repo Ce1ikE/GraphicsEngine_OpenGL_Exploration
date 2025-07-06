@@ -2,10 +2,64 @@
 
 #include <iostream>
 
+Shader::Shader()
+{
+    ID = 0;
+};
+
 Shader& Shader::Use()
 {
     glUseProgram(ID);
     return *this;
+}
+
+const char* Shader::getFragmentSource()
+{
+    return !m_fShaderFile.empty() ? m_fShaderFile.c_str() : nullptr;
+}
+
+const char* Shader::getVertexSource()
+{
+    return !m_vShaderFile.empty() ? m_vShaderFile.c_str() : nullptr;
+}
+
+const char* Shader::getGeometrySource()
+{
+    return !m_gShaderFile.empty() ? m_gShaderFile.c_str() : nullptr;
+}
+
+void Shader::setFragmentSource(const char* fragmentSourceFile)
+{
+    if (fragmentSourceFile != nullptr)
+    {
+        m_fShaderFile = std::string(fragmentSourceFile);
+    }
+}
+
+void Shader::setVertexSource(const char* vertexSourceFile)
+{
+    if (vertexSourceFile != nullptr)
+    {
+        m_vShaderFile = std::string(vertexSourceFile);
+    }
+}
+
+void Shader::setGeometrySource(const char* geometrySourceFile)
+{
+    if (geometrySourceFile != nullptr)
+    {
+        m_gShaderFile = std::string(geometrySourceFile);
+        Logger::info(
+            MESSAGE("Saved filename: " + m_gShaderFile)
+        );
+    }
+}
+
+void Shader::setSources(const char* vertexSource, const char* fragmentSource, const char* geometrySource)
+{
+    setFragmentSource(fragmentSource);
+    setGeometrySource(geometrySource);
+    setVertexSource(vertexSource);
 }
 
 void Shader::Compile(const char* vertexSource, const char* fragmentSource, const char* geometrySource)
@@ -17,11 +71,13 @@ void Shader::Compile(const char* vertexSource, const char* fragmentSource, const
     glShaderSource(sVertex, 1, &vertexSource, NULL);
     glCompileShader(sVertex);
     checkCompileErrors(sVertex, "VERTEX");
+
     // fragment Shader
     sFragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(sFragment, 1, &fragmentSource, NULL);
     glCompileShader(sFragment);
     checkCompileErrors(sFragment, "FRAGMENT");
+
     // if geometry shader source code is given, also compile geometry shader
     if (geometrySource != nullptr)
     {
@@ -134,3 +190,5 @@ void Shader::checkCompileErrors(unsigned int object, std::string type)
         }
     }
 }
+
+
